@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const port = 8000;
 const app = express();
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
+
 const User = require('./models/User');
 mongoose.connect('mongodb://localhost/userData')
 app.use(bodyParser.json());
@@ -32,7 +36,11 @@ function sendResponse(res, err, data) {
 
 app.post('/users', (req, res) => {
   User.create(
-    { ...req.body.newData },
+    {
+      name: req.body.newData.name,
+      email: req.body.newData.email,
+      password: bcrypt.hashSync(req.body.newData.password, saltRounds)
+    },
     (err, data) => { sendResponse(res, err, data) }
   )
 })
